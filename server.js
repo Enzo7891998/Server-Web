@@ -1,23 +1,28 @@
-const http = require('http');
-const fs = require("fs").promises;
-const host = 'localhost';
-const port = 8000;
+const express = require('express');
+const app = express();
 
-const requestListener = function (req, res) {
-    fs.readFile(__dirname + "/index.html")
-    .then(contents => {
-        res.setHeader("Content-Type", "text/html");
-        res.writeHead(200);
-        res.end(contents);
-    })
-    .catch(err => {
-        res.writeHead(500);
-        res.end(err);
-        return;
-    });
-};
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-const server = http.createServer(requestListener);
-server.listen(port, host, () => {
-    console.log(`Server is running on http://${host}:${port}`);
+//settings
+app.set('port', process.env.PORT || 8000);
+app.set('appName', 'Servidor web');
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.use(express.static(__dirname + '/public/'));
+
+app.listen('8000', function () {
+  console.log('Servidor web escuchando en el puerto 8000');
+});
+
+//metodo post 
+app.post('/variables', (request, response) => {
+console.log(request.body);
+  response.send(request.body.Jugador);
+});
+
+app.get('/jugador', (request, response) =>  {
+console.log(request);
+  response.render("jugador",{Jugador:request.query.Jugador});
+
 });
